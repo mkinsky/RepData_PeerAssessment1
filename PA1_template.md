@@ -114,4 +114,51 @@ nrow(activity.data[is.na(activity.data$steps), ])
 **Devise a strategy for filling in all of the missing values in the dataset. The strategy does not need to be sophisticated. For example, you could use the mean/median for that day, or the mean for that 5-minute interval, etc.**  
 
 I will impute the missing values by using the mean for that 5-minute interval.
+
+**Create a new dataset that is equal to the original dataset but with the missing data filled in.**  
+
+```r
+activity.data.non.na <- filter(activity.data, is.na(steps) == FALSE)
+activity.data.na <- filter(activity.data, is.na(steps) == TRUE)
+temp <- inner_join(average.daily.pattern, activity.data.na, by = c("interval"))
+activity.data.new <- rbind(activity.data.non.na, select(temp, steps = mean.steps, 
+    date, interval))
+```
+
+**Make a histogram of the total number of steps taken each day v2**  
+
+```r
+steps.per.day.v2 <- activity.data.new %.% # filter(steps >= 0) %.%
+select(date, steps) %.% group_by(date) %.% summarize(sum.steps = round(sum(steps), 
+    1)) %.% arrange(date)
+```
+
+
+```r
+hist(c(steps.per.day.v2$sum.steps), main = "Histogram of the Total Number of Steps Takens Each Day v2", 
+    xlab = "Steps Per Day")
+```
+
+![plot of chunk unnamed-chunk-10](figure/unnamed-chunk-10.png) 
+
+**Calculate and report the mean total number of steps taken per day v2**
+
+```r
+round(mean(steps.per.day.v2$sum.steps), 2)
+```
+
+```
+## [1] 10766
+```
+
+**Calculate and report the median total number of steps taken per day v2**
+
+```r
+median(steps.per.day.v2$sum.steps)
+```
+
+```
+## [1] 10766
+```
+
 ## Are there differences in activity patterns between weekdays and weekends?
