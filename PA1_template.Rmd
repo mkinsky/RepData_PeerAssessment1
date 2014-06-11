@@ -63,9 +63,12 @@ average.daily.pattern <- activity.data %.%
 plot(average.daily.pattern, type="l", main = "Average Daily Activity Pattern", xlab = "5-minute interval", ylab = "Avg # of steps taken across all days", col = "blue")
 ```
 
-
 ## Imputing missing values
+**Calculate and report the total number of missing values in the dataset (i.e. the total number of rows with NAs)**
+```{r, echo=TRUE}
+nrow(activity.data[is.na(activity.data$steps), ])
+```
+**Devise a strategy for filling in all of the missing values in the dataset. The strategy does not need to be sophisticated. For example, you could use the mean/median for that day, or the mean for that 5-minute interval, etc.**  
 
-
-
+I will impute the missing values by using the mean for that 5-minute interval.
 ## Are there differences in activity patterns between weekdays and weekends?

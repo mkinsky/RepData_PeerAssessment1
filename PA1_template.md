@@ -100,9 +100,18 @@ plot(average.daily.pattern, type = "l", main = "Average Daily Activity Pattern",
 ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6.png) 
 
 
-
 ## Imputing missing values
+**Calculate and report the total number of missing values in the dataset (i.e. the total number of rows with NAs)**
 
+```r
+nrow(activity.data[is.na(activity.data$steps), ])
+```
 
+```
+## [1] 2304
+```
 
+**Devise a strategy for filling in all of the missing values in the dataset. The strategy does not need to be sophisticated. For example, you could use the mean/median for that day, or the mean for that 5-minute interval, etc.**  
+
+I will impute the missing values by using the mean for that 5-minute interval.
 ## Are there differences in activity patterns between weekdays and weekends?
