@@ -2,16 +2,16 @@
 
 
 ## Loading and preprocessing the data
-**Load the data (i.e. read.csv())**
-
-```{r, echo=TRUE}
+**Load the data (i.e. read.csv())**  
+```{r, echo=FALSE}
 rm(list=ls())   #Clear all objects
 
-#Load libraries
 require(dplyr)
-require(quantmod)  
+#require(quantmod)  
 require(lattice)  
+```
 
+```{r, echo=TRUE}
 #Set directory and file vectors
 working.dir <- "C://Education//Reproducible Research//Homework//Peer Assessment 1"
 input.dir <- ".\\input\\"
@@ -35,24 +35,18 @@ steps.per.day <- activity.data %.%
   arrange(date)
 ```
 
-
 ## What is mean total number of steps taken per day?
-**Make a histogram of the total number of steps taken each day**
-
+**Make a histogram of the total number of steps taken each day**  
 ```{r fig.width=7, fig.height=6, echo=TRUE}
 hist(c(steps.per.day$sum.steps), main = "Histogram of the Total Number of Steps Takens Each Day", xlab = "Steps Per Day")
 ```
-**Calculate and report the mean total number of steps taken per day**
+**Calculate and report the mean and median total number of steps taken per day**  
 ```{r, echo=TRUE}
-options(scipen = 1, digits = 7)
-round(mean(steps.per.day$sum.steps), 2)
+options(scipen = 1, digits = 1)
+mean.steps.per.day.v1 <- mean(steps.per.day$sum.steps)
+median.steps.per.day.v1 <- median(steps.per.day$sum.steps)
 ```
-**Calculate and report the median total number of steps taken per day**
-```{r, echo=TRUE}
-options(scipen = 1, digits = 7)
-median(steps.per.day$sum.steps)
-```
-
+The mean equals `r mean.steps.per.day.v1` and the median equals `r median.steps.per.day.v1`.    
 
 ## What is the average daily activity pattern?
 **Make a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis)**
@@ -66,6 +60,11 @@ average.daily.pattern <- activity.data %.%
 
 plot(average.daily.pattern, type="l", main = "Average Daily Activity Pattern", xlab = "5-minute interval", ylab = "Avg # of steps taken across all days", col = "blue")
 ```
+**Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?**
+Based on the code below, interval 835 is the 5-minute interval which contains the maximum number of steps.
+```{r, echo=TRUE}
+subset(average.daily.pattern, mean.steps == max(average.daily.pattern$mean.steps))
+```
 
 ## Imputing missing values
 **Calculate and report the total number of missing values in the dataset (i.e. the total number of rows with NAs)**
@@ -73,7 +72,6 @@ plot(average.daily.pattern, type="l", main = "Average Daily Activity Pattern", x
 nrow(activity.data[is.na(activity.data$steps), ])
 ```
 **Devise a strategy for filling in all of the missing values in the dataset. The strategy does not need to be sophisticated. For example, you could use the mean/median for that day, or the mean for that 5-minute interval, etc.**  
-
 I will impute the missing values by using the mean for that 5-minute interval.
 
 **Create a new dataset that is equal to the original dataset but with the missing data filled in.**  
@@ -95,27 +93,26 @@ steps.per.day.v2 <- activity.data.new %.%
 ```{r fig.width=7, fig.height=6, echo=TRUE}
 hist(c(steps.per.day.v2$sum.steps), main = "Histogram of the Total Number of Steps Takens Each Day v2", xlab = "Steps Per Day")
 ```
-**Calculate and report the mean total number of steps taken per day v2**
+**Calculate and report the mean and median total number of steps taken per day v2**  
 ```{r, echo=TRUE}
-options(scipen = 1, digits = 7)
-round(mean(steps.per.day.v2$sum.steps), 2)
+options(scipen = 1, digits = 1)
+mean.steps.per.day.v2 <- mean(steps.per.day.v2$sum.steps)
+median.steps.per.day.v2 <- median(steps.per.day.v2$sum.steps)
+diff.v2 <- abs(mean.steps.per.day.v2 - median.steps.per.day.v2)
 ```
-**Calculate and report the median total number of steps taken per day v2**
-```{r, echo=TRUE}
-options(scipen = 1, digits = 7)
-round(median(steps.per.day.v2$sum.steps),2)
-```
-**Do these values differ from the estimates from the first part of the assignment?**
-The mean stays the same while the median increases slightly (i.e. 0.01%) from the first part of the assignment.
+The mean is `r mean.steps.per.day.v2` and the median is `r median.steps.per.day.v2`.  
+
+**Do these values differ from the estimates from the first part of the assignment?**  
+The mean stays the same at `r mean.steps.per.day.v1` while the median increases from `r median.steps.per.day.v1` to `r median.steps.per.day.v2` to be inline with the mean.
 
 **What is the impact of imputing missing data on the estimates of the total daily number of steps?**  
 ```{r, echo=TRUE}
-options(scipen = 1, digits = 1)
-total.daily.steps.1 <- round(summarize(steps.per.day, steps = sum(sum.steps)), 2)
+options(scipen = 0, digits = 4)
+total.daily.steps.1 <- round(summarize(steps.per.day, steps = sum  (sum.steps)), 2)
 total.daily.steps.2 <- round(summarize(steps.per.day.v2, steps = sum(sum.steps)), 2)
-delta <- Delt(total.daily.steps.1[,c("steps")], total.daily.steps.2[,c("steps")])*100
+#delta <- Delt(total.daily.steps.1[,c("steps")], total.daily.steps.2[,c("steps")])*100
 ```
-**The impact of imputing missing data on the estimates of the total daily number of steps is to increase the total daily steps from `r total.daily.steps.1` to `r total.daily.steps.2` (i.e. `r delta`%.)**
+The impact of imputing missing data on the estimates of the total daily number of steps is to increase the total daily steps from `r total.daily.steps.1` to `r total.daily.steps.2`.
 
 ## Are there differences in activity patterns between weekdays and weekends?  
 **Create a new factor variable in the dataset with two levels - "weekday" and "weekend" indicating whether a given date is a weekday or weekend day.**  
@@ -137,3 +134,5 @@ average.daily.pattern.new <- activity.data.new %.%
 
 xyplot(average.daily.pattern.new$mean.steps ~ average.daily.pattern.new$interval | average.daily.pattern.new$weekday.text, data = average.daily.pattern.new, type = "l", layout = c(1, 2), xlab = "Interval", ylab = "Number of steps")
 ```
+
+#Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
